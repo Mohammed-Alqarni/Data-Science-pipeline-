@@ -1,124 +1,50 @@
-# Pipeline Project - README
+# Project: Predicting Product Recommendations
 
-## Project Overview
-This project involves creating a machine learning pipeline to predict whether a product is recommended by a customer based on their review. The dataset provided includes numerical, categorical, and text data, and the task is to preprocess the data, train a model, fine-tune it, and evaluate its performance.
-
----
-
-## Dataset Description
-The dataset contains 8 features and 1 target variable. Below are the details:
-
-### Features:
-1. **Clothing ID**: Integer categorical variable referring to the specific product being reviewed.
-2. **Age**: Positive integer representing the age of the reviewer.
-3. **Title**: String variable representing the title of the review.
-4. **Review Text**: String variable containing the review body.
-5. **Positive Feedback Count**: Integer representing the number of customers who found the review helpful.
-6. **Division Name**: Categorical variable indicating the product's high-level division.
-7. **Department Name**: Categorical variable indicating the product's department.
-8. **Class Name**: Categorical variable indicating the product's class.
-
-### Target:
-- **Recommended IND**: Binary variable where 1 indicates the product is recommended, and 0 indicates it is not recommended.
+This project predicts whether a product will be recommended based on customer reviews using a machine learning pipeline. The data includes features like text reviews, categorical information, and numerical values.
 
 ---
 
-## Project Steps
+## Key Highlights
 
-### 1. Data Preprocessing
-- **Numerical Features**: Standardized using `StandardScaler`.
-- **Categorical Features**: Encoded using `OneHotEncoder` with `handle_unknown='ignore'`.
-- **Text Features**: Processed using `TfidfVectorizer` for both the `Title` and `Review Text` columns.
+### Data Preparation
+- Loaded the `reviews.csv` dataset and split it into features (`X`) and target (`y`).
+- Performed an 80/20 train-test split.
 
-### 2. Machine Learning Pipeline
-- Built using `sklearn.pipeline.Pipeline`.
-- Includes a preprocessing step (`ColumnTransformer`) and a classification model (`RandomForestClassifier`).
+### Pipeline Setup
+- Preprocessed numerical data using `StandardScaler`.
+- Categorical data encoded with `OneHotEncoder`.
+- Textual data transformed into numerical features using `TF-IDF Vectorizer` (limiting to 1000 features, removing stop words).
+- Combined these steps into a `ColumnTransformer` and linked it to a `RandomForestClassifier` using a pipeline.
 
-### 3. Model Training
-- Split the data into training and testing sets using an 80-20 split.
-- The initial pipeline was trained using default hyperparameters for the Random Forest Classifier.
+### Why TF-IDF?
+TF-IDF was used to convert textual data into a numerical format by capturing the importance of words in the reviews. This helps in identifying key terms influencing recommendations.
 
-### 4. Model Evaluation
-- Metrics used:
-  - **Classification Report**: Precision, recall, F1-score, and support for each class.
-  - **ROC AUC Score**: Evaluates the model's ability to distinguish between the two classes.
+```python
+from sklearn.feature_extraction.text import TfidfVectorizer
 
-### 5. Hyperparameter Tuning
-- Used `GridSearchCV` to fine-tune the Random Forest Classifier's hyperparameters:
-  - Number of estimators (`n_estimators`): [100, 200, 300].
-  - Maximum depth (`max_depth`): [10, 20, 30].
-  - Minimum samples split (`min_samples_split`): [2, 5, 10].
-- Evaluated the model using cross-validation and selected the best-performing parameters.
-
----
-
-## Results
-
-### Initial Model:
-- **Accuracy**: 85%
-- **ROC AUC Score**: 0.926
-
-### Fine-Tuned Model:
-- **Accuracy**: 83%
-- **ROC AUC Score**: 0.933
-
----
-
-## Requirements
-To run this project, ensure the following libraries are installed:
-
-- Python 3.x
-- `pandas`
-- `numpy`
-- `scikit-learn`
-- `category_encoders`
-- `spacy`
-
-Install the dependencies:
-```bash
-pip install -r requirements.txt
+# Example: Applying TF-IDF
+vectorizer = TfidfVectorizer(max_features=1000, stop_words='english')
+text_data_tfidf = vectorizer.fit_transform(text_data)  # text_data contains the review texts
+print(text_data_tfidf.shape)  # Output: (number_of_samples, 1000)
 ```
 
----
+### Model Training and Evaluation
+- Trained the pipeline on the training set.
+- Achieved an initial ROC AUC score of **0.926**, indicating good model performance.
 
-## Usage Instructions
+### Hyperparameter Tuning
+- Fine-tuned the `RandomForestClassifier` using `GridSearchCV` with parameters like `n_estimators` and `max_depth`.
+- Improved the ROC AUC score to **0.933**.
 
-### 1. Clone the Repository
-```bash
-git clone https://github.com/udacity/dsnd-pipelines-project.git
-cd dsnd-pipelines-project
-```
-
-### 2. Install Requirements
-```bash
-python -m pip install -r requirements.txt
-```
-
-### 3. Run the Notebook
-Open the Jupyter Notebook in your preferred environment and run the cells in sequence.
+### Model Performance
+- The initial model had a good weighted F1-score of **0.80**, with precision and recall values showing a strong ability to predict positive cases. However, the recall for class 0 was relatively low, which might indicate difficulty in identifying non-recommendations.
+- After fine-tuning, the recall for class 0 decreased further, but the overall ROC AUC score improved slightly, suggesting that the model prioritizes correct predictions of recommendations (class 1).
 
 ---
 
-## File Structure
-- **reviews.csv**: Dataset file.
-- **pipeline_project.ipynb**: Jupyter Notebook containing the pipeline code and analysis.
-- **README.md**: This file.
-
----
-
-## Conclusion
-This project successfully demonstrates building, training, and fine-tuning a machine learning pipeline to handle numerical, categorical, and text data effectively. The fine-tuned Random Forest Classifier achieved an impressive ROC AUC score, showing its capability to predict customer recommendations accurately.
-
----
-
-## Future Improvements
-- Experiment with other models (e.g., Gradient Boosting, XGBoost).
-- Incorporate advanced text processing techniques (e.g., embeddings like Word2Vec or BERT).
-- Address class imbalance with techniques like SMOTE or class weighting.
-- Improve hyperparameter tuning using Bayesian Optimization.
-
----
-
-## Author
-This project was completed as part of the Udacity Data Science Nanodegree program.
+## How to Run
+1. Install the required libraries: `pip install pandas scikit-learn`.
+2. Place `reviews.csv` in the project directory.
+3. Execute the script to train and evaluate the model.
+4. Review evaluation metrics and the tuned parameters in the console.
 
